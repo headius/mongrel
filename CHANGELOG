@@ -1,3 +1,5 @@
+v1.1.6.1. HTTP keepalive support (experimental)
+
 v1.1.6. Optimizations, threading patch, and cleanup for JRuby
 
 v1.1.5. Fix bug where num_processors is not actually set from mongrel_rails.
