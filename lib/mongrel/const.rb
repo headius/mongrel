@@ -88,7 +88,7 @@ module Mongrel
     MAX_BODY=MAX_HEADER
 
     # A frozen format for this is about 15% faster
-    STATUS_FORMAT = "HTTP/1.1 %d %s\r\nConnection: close\r\n".freeze
+    STATUS_FORMAT = "HTTP/1.1 %d %s\r\n".freeze
     CONTENT_TYPE = "Content-Type".freeze
     LAST_MODIFIED = "Last-Modified".freeze
     ETAG = "ETag".freeze
