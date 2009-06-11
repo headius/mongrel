@@ -71,12 +71,11 @@ module Mongrel
             # We don't want the output to be really final until we're out of the lock
             cgi.default_really_final = false
 
-            @guard.synchronize {
-              @active_request_path = request.params[Mongrel::Const::PATH_INFO] 
-              Dispatcher.dispatch(cgi, ActionController::CgiRequest::DEFAULT_SESSION_OPTIONS, response.body)
-              @active_request_path = nil
-            }
-
+            if ActionController::Base.allow_concurrency
+              _dispatch_unlocked(cgi, request, response)
+            else
+              @guard.synchronize { _dispatch_unlocked(cgi, request, response) }
+            end
             # This finalizes the output using the proper HttpResponse way
             cgi.out("text/html",true) {""}
           rescue Errno::EPIPE
@@ -99,6 +98,14 @@ module Mongrel
             ActionController::Routing::Routes.reload
           }
         end
+      end
+
+      private
+
+      def _dispatch_unlocked(cgi, request, response)
+        @active_request_path = request.params[Mongrel::Const::PATH_INFO] 
+        Dispatcher.dispatch(cgi, ActionController::CgiRequest::DEFAULT_SESSION_OPTIONS, response.body)
+        @active_request_path = nil
       end
     end
 
