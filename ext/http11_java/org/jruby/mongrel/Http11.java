@@ -62,6 +62,49 @@ public class Http11 extends RubyObject {
     public final static int MAX_HEADER_LENGTH = 1024 * (80 + 32);
     public final static String MAX_HEADER_LENGTH_ERR = "HTTP element HEADER is longer than the 114688 allowed length.";
 
+    // Pre-constructed bytelists to share for all constructed header strings
+    public static final ByteList REQUEST_METHOD_BL = ByteList.create("REQUEST_METHOD");
+    public static final ByteList REQUEST_URI_BL = ByteList.create("REQUEST_URI");
+    public static final ByteList FRAGMENT_BL = ByteList.create("FRAGMENT");
+    public static final ByteList REQUEST_PATH_BL = ByteList.create("REQUEST_PATH");
+    public static final ByteList QUERY_STRING_BL = ByteList.create("QUERY_STRING");
+    public static final ByteList HTTP_VERSION_BL = ByteList.create("HTTP_VERSION");
+    public static final ByteList HTTP_CONTENT_LENGTH_BL = ByteList.create("HTTP_CONTENT_LENGTH");
+    public static final ByteList CONTENT_LENGTH_BL = ByteList.create("CONTENT_LENGTH");
+    public static final ByteList HTTP_CONTENT_TYPE_BL = ByteList.create("HTTP_CONTENT_TYPE");
+    public static final ByteList CONTENT_TYPE_BL = ByteList.create("CONTENT_TYPE");
+    public static final ByteList GATEWAY_INTERFACE_BL = ByteList.create("GATEWAY_INTERFACE");
+    public static final ByteList CGI_1_2_BL = ByteList.create("CGI/1.2");
+    public static final ByteList HTTP_HOST_BL = ByteList.create("HTTP_HOST");
+    public static final ByteList SERVER_NAME_BL = ByteList.create("SERVER_NAME");
+    public static final ByteList SERVER_PORT_BL = ByteList.create("SERVER_PORT");
+    public static final ByteList EIGHTY_BL = ByteList.create("80");
+    public static final ByteList SERVER_PROTOCOL_BL = ByteList.create("SERVER_PROTOCOL");
+    public static final ByteList HTTP_1_1_BL = ByteList.create("HTTP/1.1");
+    public static final ByteList SERVER_SOFTWARE_BL = ByteList.create("SERVER_SOFTWARE");
+    public static final ByteList MONGREL_1_1_6_BL = ByteList.create("Mongrel 1.1.6");
+
+    public final RubyString REQUEST_METHOD;
+    public final RubyString REQUEST_URI;
+    public final RubyString FRAGMENT;
+    public final RubyString REQUEST_PATH;
+    public final RubyString QUERY_STRING;
+    public final RubyString HTTP_VERSION;
+    public final RubyString HTTP_CONTENT_LENGTH;
+    public final RubyString CONTENT_LENGTH;
+    public final RubyString HTTP_CONTENT_TYPE;
+    public final RubyString CONTENT_TYPE;
+    public final RubyString GATEWAY_INTERFACE;
+    public final RubyString CGI_1_2;
+    public final RubyString HTTP_HOST;
+    public final RubyString SERVER_NAME;
+    public final RubyString SERVER_PORT;
+    public final RubyString EIGHTY;
+    public final RubyString SERVER_PROTOCOL;
+    public final RubyString HTTP_1_1;
+    public final RubyString SERVER_SOFTWARE;
+    public final RubyString MONGREL_1_1_6;
+
 
     private static ObjectAllocator ALLOCATOR = new ObjectAllocator() {
         public IRubyObject allocate(Ruby runtime, RubyClass klass) {
@@ -103,6 +146,48 @@ public class Http11 extends RubyObject {
         this.hp.parser.http_version = http_version;
         this.hp.parser.header_done = header_done;
         this.hp.parser.init();
+
+        // prepare all hash keys ahead of time
+        REQUEST_METHOD = RubyString.newStringShared(runtime, REQUEST_METHOD_BL);
+        REQUEST_METHOD.setFrozen(true);
+        REQUEST_URI = RubyString.newStringShared(runtime, REQUEST_URI_BL);
+        REQUEST_URI.setFrozen(true);
+        FRAGMENT = RubyString.newStringShared(runtime, FRAGMENT_BL);
+        FRAGMENT.setFrozen(true);
+        REQUEST_PATH = RubyString.newStringShared(runtime, REQUEST_PATH_BL);
+        REQUEST_PATH.setFrozen(true);
+        QUERY_STRING = RubyString.newStringShared(runtime, QUERY_STRING_BL);
+        QUERY_STRING.setFrozen(true);
+        HTTP_VERSION = RubyString.newStringShared(runtime, HTTP_VERSION_BL);
+        HTTP_VERSION.setFrozen(true);
+        HTTP_CONTENT_LENGTH = RubyString.newStringShared(runtime, HTTP_CONTENT_LENGTH_BL);
+        HTTP_CONTENT_LENGTH.setFrozen(true);
+        CONTENT_LENGTH = RubyString.newStringShared(runtime, CONTENT_LENGTH_BL);
+        CONTENT_LENGTH.setFrozen(true);
+        HTTP_CONTENT_TYPE = RubyString.newStringShared(runtime, HTTP_CONTENT_TYPE_BL);
+        HTTP_CONTENT_TYPE.setFrozen(true);
+        CONTENT_TYPE = RubyString.newStringShared(runtime, CONTENT_TYPE_BL);
+        CONTENT_TYPE.setFrozen(true);
+        GATEWAY_INTERFACE = RubyString.newStringShared(runtime, GATEWAY_INTERFACE_BL);
+        GATEWAY_INTERFACE.setFrozen(true);
+        CGI_1_2 = RubyString.newStringShared(runtime, CGI_1_2_BL);
+        CGI_1_2.setFrozen(true);
+        HTTP_HOST = RubyString.newStringShared(runtime, HTTP_HOST_BL);
+        HTTP_HOST.setFrozen(true);
+        SERVER_NAME = RubyString.newStringShared(runtime, SERVER_NAME_BL);
+        SERVER_NAME.setFrozen(true);
+        SERVER_PORT = RubyString.newStringShared(runtime, SERVER_PORT_BL);
+        SERVER_PORT.setFrozen(true);
+        EIGHTY = RubyString.newStringShared(runtime, EIGHTY_BL);
+        EIGHTY.setFrozen(true);
+        SERVER_PROTOCOL = RubyString.newStringShared(runtime, SERVER_PROTOCOL_BL);
+        SERVER_PROTOCOL.setFrozen(true);
+        HTTP_1_1 = RubyString.newStringShared(runtime, HTTP_1_1_BL);
+        HTTP_1_1.setFrozen(true);
+        SERVER_SOFTWARE = RubyString.newStringShared(runtime, SERVER_SOFTWARE_BL);
+        SERVER_SOFTWARE.setFrozen(true);
+        MONGREL_1_1_6 = RubyString.newStringShared(runtime, MONGREL_1_1_6_BL);
+        MONGREL_1_1_6.setFrozen(true);
     }
 
     public void validateMaxLength(int len, int max, String msg) {
@@ -119,6 +204,7 @@ public class Http11 extends RubyObject {
                 validateMaxLength(vlen, MAX_FIELD_VALUE_LENGTH, MAX_FIELD_VALUE_LENGTH_ERR);
 
                 v = RubyString.newString(runtime, new ByteList(Http11.this.hp.parser.buffer,value,vlen));
+                // FIXME: There should be a way to preallocate these headers
                 f = RubyString.newString(runtime, "HTTP_");
                 ByteList b = new ByteList(Http11.this.hp.parser.buffer,field,flen);
                 for(int i=0,j=b.realSize;i<j;i++) {
@@ -129,7 +215,8 @@ public class Http11 extends RubyObject {
                     }
                 }
                 f.cat(b);
-                req.aset(f,v);
+                f.setFrozen(true);
+                req.fastASet(f,v);
             }
         };
 
@@ -137,7 +224,7 @@ public class Http11 extends RubyObject {
             public void call(Object data, int at, int length) {
                 RubyHash req = (RubyHash)data;
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("REQUEST_METHOD"),val);
+                req.fastASet(REQUEST_METHOD,val);
             }
         };
 
@@ -146,7 +233,7 @@ public class Http11 extends RubyObject {
                 RubyHash req = (RubyHash)data;
                 validateMaxLength(length, MAX_REQUEST_URI_LENGTH, MAX_REQUEST_URI_LENGTH_ERR);
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("REQUEST_URI"),val);
+                req.fastASet(REQUEST_URI,val);
             }
         };
 
@@ -155,7 +242,7 @@ public class Http11 extends RubyObject {
                 RubyHash req = (RubyHash)data;
                 validateMaxLength(length, MAX_FRAGMENT_LENGTH, MAX_FRAGMENT_LENGTH_ERR);
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("FRAGMENT"),val);
+                req.fastASet(FRAGMENT,val);
             }
         };
 
@@ -164,7 +251,7 @@ public class Http11 extends RubyObject {
                 RubyHash req = (RubyHash)data;
                 validateMaxLength(length, MAX_REQUEST_PATH_LENGTH, MAX_REQUEST_PATH_LENGTH_ERR);
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("REQUEST_PATH"),val);
+                req.fastASet(REQUEST_PATH,val);
             }
         };
 
@@ -173,7 +260,7 @@ public class Http11 extends RubyObject {
                 RubyHash req = (RubyHash)data;
                 validateMaxLength(length, MAX_QUERY_STRING_LENGTH, MAX_QUERY_STRING_LENGTH_ERR);
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("QUERY_STRING"),val);
+                req.fastASet(QUERY_STRING,val);
             }
         };
 
@@ -181,7 +268,7 @@ public class Http11 extends RubyObject {
             public void call(Object data, int at, int length) {
                 RubyHash req = (RubyHash)data;
                 RubyString val = RubyString.newString(runtime,new ByteList(hp.parser.buffer,at,length));
-                req.aset(runtime.newString("HTTP_VERSION"),val);
+                req.fastASet(HTTP_VERSION,val);
             }
         };
 
@@ -190,32 +277,32 @@ public class Http11 extends RubyObject {
                 RubyHash req = (RubyHash)data;
                 IRubyObject temp,ctype,clen;
                 
-                clen = req.aref(runtime.newString("HTTP_CONTENT_LENGTH"));
-                if(!clen.isNil()) {
-                    req.aset(runtime.newString("CONTENT_LENGTH"),clen);
+                clen = req.fastARef(HTTP_CONTENT_LENGTH);
+                if(clen != null) {
+                    req.fastASet(CONTENT_LENGTH,clen);
                 }
 
-                ctype = req.aref(runtime.newString("HTTP_CONTENT_TYPE"));
-                if(!ctype.isNil()) {
-                    req.aset(runtime.newString("CONTENT_TYPE"),ctype);
+                ctype = req.fastARef(HTTP_CONTENT_TYPE);
+                if(ctype != null) {
+                    req.fastASet(CONTENT_TYPE,ctype);
                 }
 
-                req.aset(runtime.newString("GATEWAY_INTERFACE"),runtime.newString("CGI/1.2"));
-                if(!(temp = req.aref(runtime.newString("HTTP_HOST"))).isNil()) {
+                req.fastASet(GATEWAY_INTERFACE,CGI_1_2);
+                if((temp = req.fastARef(HTTP_HOST)) != null) {
                     String s = temp.toString();
                     int colon = s.indexOf(':');
                     if(colon != -1) {
-                        req.aset(runtime.newString("SERVER_NAME"),runtime.newString(s.substring(0,colon)));
-                        req.aset(runtime.newString("SERVER_PORT"),runtime.newString(s.substring(colon+1)));
+                        req.fastASet(SERVER_NAME,runtime.newString(s.substring(0,colon)));
+                        req.fastASet(SERVER_PORT,runtime.newString(s.substring(colon+1)));
                     } else {
-                        req.aset(runtime.newString("SERVER_NAME"),temp);
-                        req.aset(runtime.newString("SERVER_PORT"),runtime.newString("80"));
+                        req.fastASet(SERVER_NAME,temp);
+                        req.fastASet(SERVER_PORT,EIGHTY);
                     }
                 }
 
                 req.setInstanceVariable("@http_body", RubyString.newString(runtime, new ByteList(hp.parser.buffer, at, length)));
-                req.aset(runtime.newString("SERVER_PROTOCOL"),runtime.newString("HTTP/1.1"));
-                req.aset(runtime.newString("SERVER_SOFTWARE"),runtime.newString("Mongrel 1.1.5"));
+                req.fastASet(SERVER_PROTOCOL,HTTP_1_1);
+                req.fastASet(SERVER_SOFTWARE,MONGREL_1_1_6);
             }
         };
 
