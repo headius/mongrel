@@ -111,7 +111,7 @@ when /java/
     build_dir = "ext/http11_java/classes"
     mkdir_p build_dir
     sources = FileList['ext/http11_java/**/*.java'].join(' ')
-    sh "javac -target 1.4 -source 1.4 -d #{build_dir} #{java_classpath_arg} #{sources}"
+    sh "javac -target 1.5 -source 1.5 -d #{build_dir} #{java_classpath_arg} #{sources}"
     sh "jar cf lib/http11.jar -C #{build_dir} ."
     move_extensions
   end

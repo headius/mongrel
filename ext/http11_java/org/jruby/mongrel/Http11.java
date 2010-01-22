@@ -34,6 +34,7 @@ import org.jruby.RubyModule;
 import org.jruby.RubyNumeric;
 import org.jruby.RubyObject;
 import org.jruby.RubyString;
+import org.jruby.anno.JRubyMethod;
 
 import org.jruby.runtime.CallbackFactory;
 import org.jruby.runtime.ObjectAllocator;
@@ -116,16 +117,8 @@ public class Http11 extends RubyObject {
         RubyModule mMongrel = runtime.defineModule("Mongrel");
         mMongrel.defineClassUnder("HttpParserError",runtime.getClass("IOError"),runtime.getClass("IOError").getAllocator());
 
-        CallbackFactory cf = runtime.callbackFactory(Http11.class);
-
         RubyClass cHttpParser = mMongrel.defineClassUnder("HttpParser",runtime.getObject(),ALLOCATOR);
-        cHttpParser.defineFastMethod("initialize",cf.getFastMethod("initialize"));
-        cHttpParser.defineFastMethod("reset",cf.getFastMethod("reset"));
-        cHttpParser.defineFastMethod("finish",cf.getFastMethod("finish"));
-        cHttpParser.defineFastMethod("execute",cf.getFastMethod("execute", IRubyObject.class, IRubyObject.class, IRubyObject.class));
-        cHttpParser.defineFastMethod("error?",cf.getFastMethod("has_error"));
-        cHttpParser.defineFastMethod("finished?",cf.getFastMethod("is_finished"));
-        cHttpParser.defineFastMethod("nread",cf.getFastMethod("nread"));
+        cHttpParser.defineAnnotatedMethods(Http11.class);
     }
 
     private Ruby runtime;
@@ -306,21 +299,25 @@ public class Http11 extends RubyObject {
             }
         };
 
+    @JRubyMethod
     public IRubyObject initialize() {
         this.hp.parser.init();
         return this;
     }
 
+    @JRubyMethod
     public IRubyObject reset() {
         this.hp.parser.init();
         return runtime.getNil();
     }
 
+    @JRubyMethod
     public IRubyObject finish() {
         this.hp.finish();
         return this.hp.is_finished() ? runtime.getTrue() : runtime.getFalse();
     }
 
+    @JRubyMethod
     public IRubyObject execute(IRubyObject req_hash, IRubyObject data, IRubyObject start) {
         int from = 0;
         from = RubyNumeric.fix2int(start);
@@ -339,14 +336,17 @@ public class Http11 extends RubyObject {
         }
     }
 
+    @JRubyMethod(name = "error?")
     public IRubyObject has_error() {
         return this.hp.has_error() ? runtime.getTrue() : runtime.getFalse();
     }
 
+    @JRubyMethod(name = "finished?")
     public IRubyObject is_finished() {
         return this.hp.is_finished() ? runtime.getTrue() : runtime.getFalse();
     }
 
+    @JRubyMethod
     public IRubyObject nread() {
         return runtime.newFixnum(this.hp.parser.nread);
     }
